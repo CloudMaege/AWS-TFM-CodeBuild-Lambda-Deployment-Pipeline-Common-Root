@@ -112,7 +112,7 @@ The following variables are defined and utilized by this module directly and can
 
 This variable value defines the region that all of the resources that this project root module produces are deployed in.
 
-<br><br>
+<br>
 
 ### Declaration in variables.tf
 
@@ -136,7 +136,7 @@ variable "provider_region" {
 
 This variable value defines the target VPC where the CodeBuild Security Group will be created. The VPC Id can also be obtained using a TF data source if the VPC was previously deployed using Terraform and provided that this project root module has the necessary permissions to query the TF state file.
 
-<br><br>
+<br>
 
 ### Declaration in variables.tf
 
@@ -159,7 +159,7 @@ variable "vpc_id" {
 
 This variable value defines the name that will be given to the created CodeBuild event notification topic. This variable is optional, if no value is set, then the default value of `codebuild_lambda_deployment_pipeline_event_notifications` will be used to name the topic.
 
-<br><br>
+<br>
 
 ### Declaration in variables.tf
 
@@ -183,7 +183,7 @@ variable "sns_topic_name" {
 
 This variable value defines the display name that will be given to the created CodeBuild event notification topic. This variable is optional, if no value is set, then the default value of `CodeBuild-Lambda-Deployment-Pipeline-Event-Notifications` will be used as the display name of the topic.
 
-<br><br>
+<br>
 
 ### Declaration in variables.tf
 
@@ -207,7 +207,7 @@ variable "sns_display_name" {
 
 This variable value defines the name that will be given to the CodeBuild security group on creation. This is an optional variable if no value is defined, then the default value of `CodeBuild-Lambda-Pipeline-SG` will be given for the Security Group Name.
 
-<br><br>
+<br>
 
 ### Declaration in variables.tf
 
