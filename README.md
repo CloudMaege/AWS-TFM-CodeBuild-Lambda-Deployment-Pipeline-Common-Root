@@ -1,7 +1,9 @@
 <!-- markdownlint-disable MD024 -->
 <!-- markdownlint-disable MD025 -->
 <!-- markdownlint-disable MD036 -->
-# TerraForm AWS CodeBuild Lambda Deployment Pipeline Common Root
+# TF AWS CodeBuild Lambda Deployment Pipeline Common Root
+
+<br>
 
 ![Hero](images/tf_cb_lambda.png)  
 
@@ -24,7 +26,7 @@ This project will deploy all of the resources required and will become a depende
 This project root module will rely on the following modules to create the resources required:
 
 - [KMS CMK Module](https://github.com/CloudMage-TF/AWS-KMS-Module.git)
-- [S3 Encrypted Bucket Module](git@github.com:CloudMage-TF/AWS-S3Bucket-Module.git)
+- [S3 Encrypted Bucket Module](https://github.com/CloudMage-TF/AWS-S3Bucket-Module.git)
 - [CodeBuild Lambda Deployment Role](https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Role-Module.git)
 
 <br><br>
@@ -38,8 +40,6 @@ This project root module will create the following resources required for future
 ## CodeBuild Role
 
 The Role that this project will provide is a common role that allows CodeBuild to deploy Lambda functions. It is being separated from any individual Lambda deployment TF project so that multiple projects that contain Lambda function only deployments can be built using a common role instead of having N number of roles provisioned that all would otherwise have the same permission sets, which are the permissions required to provision and deploy Lambda functions
-
-<br>
 
 - Used by the CodeBuild service to allocate service resources required by CodeBuild projects to execute
 - Allow the creation of CloudWatch log streams, and log writing
@@ -56,8 +56,6 @@ The Role that this project will provide is a common role that allows CodeBuild t
 
 KMS Customer Managed Key (CMK) that will be provisioned and used to encrypt and decrypt both objects stored in S3 as well as the SNS Topic notifications.
 
-<br>
-
 - KMS CMK that will be used to encrypt various elements of CodeBuild Lambda deployment pipeline projects
 - CodeBuild will use this CMK to encrypt build artifacts being stored in S3
 - CodeBuild will use this CMK to encrypt SNS CodeBuild event notifications
@@ -68,8 +66,6 @@ KMS Customer Managed Key (CMK) that will be provisioned and used to encrypt and 
 ## CodeBuild S3 Deployment Artifact Bucket
 
 Common deployment artifact bucket that CodeBuild will use for all lambda function deployment projects that require the use of an S3 bucket.
-
-<br>
 
 - S3 bucket will be used for various CodeBuild Lambda Deployment projects to store and retrieve build artifacts
 - Encryption will be forced within the CodeBuild bucket by an automatic Bucket Policy
@@ -84,8 +80,6 @@ Common deployment artifact bucket that CodeBuild will use for all lambda functio
 
 This SNS topic will be used for notifications for the encountering of any errors or failures that may be incurred during the deployment of a lambda function by CodeBuild. Again this single common topic will be passed to any Lambda deployment CodeBuild jobs that are provisioned in the future.
 
-<br>
-
 - SNS topics will be used to notify stakeholders of CodeBuild execution events.
 - The topic will be encrypted with the provisioned KMS CMK.
 - SNS topic provisioning will be handled directly by this project root module
@@ -95,8 +89,6 @@ This SNS topic will be used for notifications for the encountering of any errors
 ## CodeBuild Security Group
 
 This SG is a simple SG that allows CodeBuild outbound access so that it can update and download dependencies required by the build environment for Lambda specific CodeBuild jobs. It currently allows no ingress and egress to any.
-
-<br>
 
 - Security Group will allow all traffic outbound to allow the CodeBuild environment to update and install any required build dependencies.
 - Inbound traffic will not be configured on the Security Group.
