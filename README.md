@@ -667,17 +667,17 @@ Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
 persisted to local or remote state storage.
 
-module.codebuild_s3_artifact_bucket.data.aws_region.current: Refreshing state...
-module.codebuild_service_role.data.aws_caller_identity.current: Refreshing state...
-module.codebuild_service_role.data.aws_iam_policy_document.principal_policy: Refreshing state...
 module.codebuild_s3_artifact_bucket.data.aws_caller_identity.current: Refreshing state...
+module.codebuild_service_role.data.aws_caller_identity.current: Refreshing state...
 module.codebuild_service_role.data.aws_iam_policy_document.access_policy: Refreshing state...
+module.codebuild_s3_artifact_bucket.data.aws_region.current: Refreshing state...
 module.codebuild_cmk.data.aws_caller_identity.current: Refreshing state...
-module.codebuild_s3_artifact_bucket.data.aws_iam_policy_document.this: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_user_policy: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_owner_policy: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_admin_policy: Refreshing state...
+module.codebuild_service_role.data.aws_iam_policy_document.principal_policy: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.kms_resource_policy: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_admin_policy: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_owner_policy: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_user_policy: Refreshing state...
+module.codebuild_s3_artifact_bucket.data.aws_iam_policy_document.this: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.temp_kms_owner_kms_admin_merge_policy: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.temp_kms_admin_kms_user_merge_policy: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.this: Refreshing state...
@@ -754,7 +754,7 @@ Terraform will perform the following actions:
                       + Action    = "kms:*"
                       + Effect    = "Allow"
                       + Principal = {
-                          + AWS = "arn:aws:iam::987303449646:root"
+                          + AWS = "arn:aws:iam::123456789101:root"
                         }
                       + Resource  = "*"
                       + Sid       = "KMSKeyOwnerPolicy"
@@ -763,7 +763,6 @@ Terraform will perform the following actions:
               + Version   = "2012-10-17"
             }
         )
-      + tags                    = (known after apply)
     }
 
   # module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0] will be created
@@ -771,7 +770,7 @@ Terraform will perform the following actions:
       + acceleration_status         = (known after apply)
       + acl                         = "private"
       + arn                         = (known after apply)
-      + bucket                      = "account-prefix-codebuild-lambda-artifact-bucket-region-suffix"
+      + bucket                      = "123456789101-codebuild-lambda-artifact-bucket-us-east-2"
       + bucket_domain_name          = (known after apply)
       + bucket_regional_domain_name = (known after apply)
       + force_destroy               = false
@@ -792,18 +791,17 @@ Terraform will perform the following actions:
                           + AWS = "*"
                         }
                       + Resource  = [
-                          + "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          + "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
+                          + "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2/*",
+                          + "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2",
                         ]
                       + Sid       = "DenyNonSecureTransport"
-                    },
+                    }
                 ]
               + Version   = "2012-10-17"
             }
         )
       + region                      = "us-east-2"
       + request_payer               = (known after apply)
-      + tags                        = (known after apply)
       + website_domain              = (known after apply)
       + website_endpoint            = (known after apply)
 
@@ -915,7 +913,6 @@ Terraform will perform the following actions:
       + max_session_duration  = 14400
       + name                  = "CodeBuild-Lambda-Pipeline-Service-Role"
       + path                  = "/"
-      + tags                  = (known after apply)
       + unique_id             = (known after apply)
     }
 
@@ -1030,7 +1027,7 @@ module.codebuild_service_role.aws_iam_role_policy.sns_policy[0]: Creation comple
 module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Still creating... [10s elapsed]
 module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Still creating... [20s elapsed]
 module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Still creating... [30s elapsed]
-module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Creation complete after 37s [id=account-prefix-codebuild-lambda-artifact-bucket-region-suffix]
+module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Creation complete after 37s [id=123456789101-codebuild-lambda-artifact-bucket-us-east-2]
 module.codebuild_service_role.data.aws_iam_policy_document.s3_policy[0]: Refreshing state...
 module.codebuild_service_role.aws_iam_role_policy.s3_policy[0]: Creating...
 module.codebuild_service_role.aws_iam_role_policy.s3_policy[0]: Creation complete after 1s [id=CodeBuild-Lambda-Pipeline-Service-Role:CodeBuild-Lambda-Pipeline-Service-Role-S3Policy]
@@ -1045,13 +1042,13 @@ kms_key_alias = arn:aws:kms:us-east-2:123456789101:alias/cmk/codebuild
 kms_key_arn = arn:aws:kms:us-east-2:123456789101:key/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 kms_key_id = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 s3_bucket_arn = [
-  "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
+  "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2",
 ]
 s3_bucket_domain_name = [
-  "account-prefix-codebuild-lambda-artifact-bucket-region-suffix.s3.amazonaws.com",
+  "123456789101-codebuild-lambda-artifact-bucket-us-east-2.s3.amazonaws.com",
 ]
 s3_bucket_id = [
-  "account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
+  "123456789101-codebuild-lambda-artifact-bucket-us-east-2",
 ]
 s3_bucket_region = [
   "us-east-2",
@@ -1090,7 +1087,7 @@ module.codebuild_cmk.aws_kms_key.this: Refreshing state... [id=xxxxxxxx-xxxx-xxx
 module.codebuild_cmk.aws_kms_alias.this: Refreshing state... [id=alias/cmk/codebuild]
 module.codebuild_service_role.data.aws_iam_policy_document.cmk_policy[0]: Refreshing state...
 aws_sns_topic.events: Refreshing state... [id=arn:aws:sns:us-east-2:123456789101:codebuild_lambda_deployment_pipeline_event_notifications]
-module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Refreshing state... [id=account-prefix-codebuild-lambda-artifact-bucket-region-suffix]
+module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Refreshing state... [id=123456789101-codebuild-lambda-artifact-bucket-us-east-2]
 module.codebuild_service_role.aws_iam_role_policy.cmk_policy[0]: Refreshing state... [id=CodeBuild-Lambda-Pipeline-Service-Role:CodeBuild-Lambda-Pipeline-Service-Role-CMKPolicy]
 module.codebuild_service_role.data.aws_iam_policy_document.sns_policy[0]: Refreshing state...
 module.codebuild_service_role.aws_iam_role_policy.sns_policy[0]: Refreshing state... [id=CodeBuild-Lambda-Pipeline-Service-Role:CodeBuild-Lambda-Pipeline-Service-Role-SNSPolicy]
@@ -1218,13 +1215,13 @@ Terraform will perform the following actions:
   # module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0] will be destroyed
   - resource "aws_s3_bucket" "encrypted_bucket" {
       - acl                         = "private" -> null
-      - arn                         = "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix" -> null
-      - bucket                      = "account-prefix-codebuild-lambda-artifact-bucket-region-suffix" -> null
-      - bucket_domain_name          = "account-prefix-codebuild-lambda-artifact-bucket-region-suffix.s3.amazonaws.com" -> null
-      - bucket_regional_domain_name = "account-prefix-codebuild-lambda-artifact-bucket-region-suffix.s3.us-east-2.amazonaws.com" -> null
+      - arn                         = "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2" -> null
+      - bucket                      = "123456789101-codebuild-lambda-artifact-bucket-us-east-2" -> null
+      - bucket_domain_name          = "123456789101-codebuild-lambda-artifact-bucket-us-east-2.s3.amazonaws.com" -> null
+      - bucket_regional_domain_name = "123456789101-codebuild-lambda-artifact-bucket-us-east-2.s3.us-east-2.amazonaws.com" -> null
       - force_destroy               = false -> null
-      - hosted_zone_id              = "Z2O1EMRO9K5GLX" -> null
-      - id                          = "account-prefix-codebuild-lambda-artifact-bucket-region-suffix" -> null
+      - hosted_zone_id              = "A123BCD56E7FGH" -> null
+      - id                          = "123456789101-codebuild-lambda-artifact-bucket-us-east-2" -> null
       - policy                      = jsonencode(
             {
               - Statement = [
@@ -1240,48 +1237,11 @@ Terraform will perform the following actions:
                           - AWS = "*"
                         }
                       - Resource  = [
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
+                          - "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2/*",
+                          - "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2",
                         ]
                       - Sid       = "DenyNonSecureTransport"
-                    },
-                  - {
-                      - Action    = "s3:PutObject"
-                      - Condition = {
-                          - StringNotEquals = {
-                              - s3:x-amz-server-side-encryption = [
-                                  - "aws:kms",
-                                  - "AES256",
-                                ]
-                            }
-                        }
-                      - Effect    = "Deny"
-                      - Principal = {
-                          - AWS = "*"
-                        }
-                      - Resource  = [
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
-                        ]
-                      - Sid       = "DenyIncorrectEncryptionHeader"
-                    },
-                  - {
-                      - Action    = "s3:PutObject"
-                      - Condition = {
-                          - Null = {
-                              - s3:x-amz-server-side-encryption = "true"
-                            }
-                        }
-                      - Effect    = "Deny"
-                      - Principal = {
-                          - AWS = "*"
-                        }
-                      - Resource  = [
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
-                        ]
-                      - Sid       = "DenyUnEncryptedObjectUploads"
-                    },
+                    }
                 ]
               - Version   = "2012-10-17"
             }
@@ -1331,7 +1291,7 @@ Terraform will perform the following actions:
       - name                  = "CodeBuild-Lambda-Pipeline-Service-Role" -> null
       - path                  = "/" -> null
       - tags                  = {} -> null
-      - unique_id             = "AROA6LX67CQXBMXDUZPDQ" -> null
+      - unique_id             = "ABCDEFG1234567HIJKLMN" -> null
     }
 
   # module.codebuild_service_role.aws_iam_role_policy.access_policy will be destroyed
@@ -1436,8 +1396,8 @@ Terraform will perform the following actions:
                         ]
                       - Effect   = "Allow"
                       - Resource = [
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          - "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
+                          - "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2/*",
+                          - "arn:aws:s3:::123456789101-codebuild-lambda-artifact-bucket-us-east-2",
                         ]
                       - Sid      = "LambdaPipelineS3Access"
                     },
@@ -1487,7 +1447,7 @@ module.codebuild_service_role.aws_iam_role_policy.cmk_policy[0]: Destruction com
 module.codebuild_service_role.aws_iam_role_policy.sns_policy[0]: Destruction complete after 0s
 module.codebuild_service_role.aws_iam_role_policy.access_policy: Destruction complete after 0s
 module.codebuild_service_role.aws_iam_role.this: Destroying... [id=CodeBuild-Lambda-Pipeline-Service-Role]
-module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Destroying... [id=account-prefix-codebuild-lambda-artifact-bucket-region-suffix]
+module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0]: Destroying... [id=123456789101-codebuild-lambda-artifact-bucket-us-east-2]
 aws_sns_topic.events: Destroying... [id=arn:aws:sns:us-east-2:123456789101:codebuild_lambda_deployment_pipeline_event_notifications]
 module.codebuild_cmk.aws_kms_alias.this: Destruction complete after 0s
 aws_sns_topic.events: Destruction complete after 0s
@@ -1517,37 +1477,37 @@ The template will finally create the following outputs that can be pulled and us
 ######################
 # KMS Key Outputs:   #
 ######################
-output "kms_key_arn" {}
 output "kms_key_id" {}
+output "kms_key_arn" {}
 output "kms_key_alias" {}
 
 ######################
 # SNS Topic Outputs: #
 ######################
-output "sns_topic_arn" {}
 output "sns_topic_id" {}
+output "sns_topic_arn" {}
 
 ######################
 # S3 Bucket Outputs: #
 ######################
-output "s3_bucket_arn" {}
 output "s3_bucket_id" {}
+output "s3_bucket_arn" {}
 output "s3_bucket_domain_name" {}
 output "s3_bucket_region" {}
 
 ###########################
 # Security Group Outputs: #
 ###########################
-output "security_group_arn" {}
 output "security_group_id" {}
+output "security_group_arn" {}
 output "security_group_name" {}
 output "security_group_vpc_id" {}
 
 #################
 # Role Outputs: #
 #################
-output "codebuild_role_arn" {}
 output "codebuild_role_id" {}
+output "codebuild_role_arn" {}
 ```
 
 <br><br>
@@ -1562,38 +1522,44 @@ When using and calling the module within a root project, the output values of th
 ######################
 # KMS Key Outputs:   #
 ######################
-output "kms_key_arn" {
-    value = module.codebuild_cmk.kms_key_arn
-}
 output "kms_key_id" {
-    value = module.codebuild_cmk.kms_key_id
+  value = module.codebuild_cmk.kms_key_id
 }
+
+output "kms_key_arn" {
+  value = module.codebuild_cmk.kms_key_arn
+}
+
 output "kms_key_alias" {
-    value = module.codebuild_cmk.kms_key_alias
+  value = module.codebuild_cmk.kms_key_alias
 }
 
 ######################
 # SNS Topic Outputs: #
 ######################
-output "sns_topic_arn" {
-    value = aws_sns_topic.events.arn
-}
 output "sns_topic_id" {
-    value = aws_sns_topic.events.id
+  value = aws_sns_topic.events.id
+}
+
+output "sns_topic_arn" {
+  value = aws_sns_topic.events.arn
 }
 
 ######################
 # S3 Bucket Outputs: #
 ######################
-output "s3_bucket_arn" {
-  value = module.codebuild_s3_artifact_bucket.s3_bucket_arn
-}
 output "s3_bucket_id" {
   value = module.codebuild_s3_artifact_bucket.s3_bucket_id
 }
+
+output "s3_bucket_arn" {
+  value = module.codebuild_s3_artifact_bucket.s3_bucket_arn
+}
+
 output "s3_bucket_domain_name" {
   value = module.codebuild_s3_artifact_bucket.s3_bucket_domain_name
 }
+
 output "s3_bucket_region" {
   value = module.codebuild_s3_artifact_bucket.s3_bucket_region
 }
@@ -1601,15 +1567,18 @@ output "s3_bucket_region" {
 ###########################
 # Security Group Outputs: #
 ###########################
-output "security_group_arn" {
-  value = aws_security_group.codebuild_security_group.arn
-}
 output "security_group_id" {
   value = aws_security_group.codebuild_security_group.id
 }
+
+output "security_group_arn" {
+  value = aws_security_group.codebuild_security_group.arn
+}
+
 output "security_group_name" {
   value = aws_security_group.codebuild_security_group.name
 }
+
 output "security_group_vpc_id" {
   value = aws_security_group.codebuild_security_group.vpc_id
 }
@@ -1617,23 +1586,18 @@ output "security_group_vpc_id" {
 #################
 # Role Outputs: #
 #################
-output "codebuild_role_arn" {
-  value = module.codebuild_service_role.codebuild_role_arn
-}
 output "codebuild_role_id" {
   value = module.codebuild_service_role.codebuild_role_id
+}
+
+output "codebuild_role_arn" {
+  value = module.codebuild_service_role.codebuild_role_arn
 }
 ```
 
 <br>
 
 > __Note:__ When referencing the module outputs be sure that the output value contains the identifier given to the module call. As an example if the module was defined as `module "demo_cmk" {}` then the output reference would be constructed as `module.demo_cmk.kms_key_arn`.
-
-<br><br>
-
-# Dependencies
-
-This project root module depends on the above referenced KMS, S3 and CodeBuild Lambda Role modules that it uses to provision those respective resources.
 
 <br><br>
 
