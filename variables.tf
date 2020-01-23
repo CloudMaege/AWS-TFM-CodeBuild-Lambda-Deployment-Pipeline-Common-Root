@@ -124,7 +124,7 @@ variable "tags" {
   type        = map
   description = "Specify any tags that should be added to the resources being provisioned."
   default     = {
-    Provisoned_By   = "Terraform"
+    Provisioned_By  = "Terraform"
     Root_GitHub_URL = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
   }
 }

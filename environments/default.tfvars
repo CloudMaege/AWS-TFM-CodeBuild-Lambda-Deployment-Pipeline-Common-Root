@@ -53,8 +53,8 @@ role_description      = "CodeBuild Role that allows CodeBuild to build, create, 
 # Required Tags:                                                          #
 ###########################################################################
 tags = {
-    Provisoned_By    = "Terraform"
-    Root_GitHub_URL  = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
+    Provisioned_By  = "Terraform"
+    Root_GitHub_URL = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
 }
 
 
