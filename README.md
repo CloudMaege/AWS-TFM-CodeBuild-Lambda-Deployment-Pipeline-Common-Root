@@ -1,6 +1,5 @@
-<!-- markdownlint-disable MD024 -->
-<!-- markdownlint-disable MD025 -->
-<!-- markdownlint-disable MD036 -->
+<!-- VSCode Markdown Exclusions-->
+<!-- markdownlint-disable MD025 Single Title Headers-->
 # TF AWS CodeBuild Lambda Deployment Pipeline Common Root
 
 <br>
@@ -15,7 +14,7 @@ This Terraform project root module has been created to provide all of the requir
 
 <br><br>
 
-# Module Pre-Requisites
+# Module Pre-Requisites and Dependencies
 
 This project will deploy all of the resources required and will become a dependency for future Lambda pipeline projects.
 
@@ -96,9 +95,97 @@ This SG is a simple SG that allows CodeBuild outbound access so that it can upda
 
 <br><br>
 
-# Variables
+# Terraform Variables
 
-The following variables are defined and utilized by this module directly and can cause the project root module to behave dynamically based upon the values that are defined.
+Module variables that need to either be defined or re-defined with a non-default value can easily be hardcoded inline directly within the module call block or from within the root project that is consuming the module. If using the second approach then the root project must have it's own custom variables defined within the projects `variables.tf` file with set default values or with the values provided from a separate environmental `terraform.tfvar` file. Examples of both approaches can be found below. Note that for the standards used within this documentation, all variables will mostly use the first approach for ease of readability.
+
+<br>
+
+> __NOTE:__ There is also a third way to provide variable values using Terraform data sources. A data source is a unique type of code block used within a project that either instantiates or collects data that can be referenced throughout the project. A data source, for example,  can be declared to read the terraform state file and gather all of the available information from a previously deployed project stack. Any of the data contained within the data source can then be referenced to set the value of a project or module variable.
+
+<br><br>
+
+## Setting Variables Inline
+
+```terraform
+module "kms" {
+  source = "git@github.com:CloudMage-TF/AWS-KMS-Module?ref=v1.0.3"
+
+  // Required Variables
+  kms_key_alias_name        = "prod/s3"
+}
+```
+
+<br><br>
+
+## Setting Variables in a Terraform Root Project
+
+<br>
+
+### Terraform Root Project/variables.tf
+
+```terraform
+variable "cmk_alias" {
+  type        = string
+  description = "Meaningful Description"
+}
+```
+
+<br>
+
+### Terraform Root Project/terraform.tfvars
+
+```terraform
+cmk_alias = "dev/ebs"
+```
+
+<br>
+
+### Terraform Root Project/main.tf
+
+```terraform
+module "kms" {
+  source = "git@github.com:CloudMage-TF/AWS-KMS-Module?ref=v1.0.3"
+
+  // Required Variables
+  kms_key_alias_name = var.cmk_alias
+}
+```
+
+<br><br>
+
+# Required Variables
+
+The following required module variables do not contain default values and must be set by the consumer of the module to use the module successfully.
+
+<br><br>
+
+## :red_circle: vpc_id
+
+<br>
+
+![Required](images/neon_required.png)
+
+<br>
+
+This variable value defines the target VPC where the CodeBuild Security Group will be created. The VPC Id can be defined as a string value or also be obtained using a TF data source if the VPC was previously deployed using Terraform and provided that this project root module has the necessary permissions to query the TF state file.
+
+<br>
+
+### Declaration in variables.tf
+
+```terraform
+variable "vpc_id" {
+  description = "The id of the VPC that the CodeBuild Security Group will be placed in. This information can also be gathered from a data source if the VPC was deployed using TF."
+  type        = string
+}
+```
+
+<br><br>
+
+# Optional Variables
+
+The following optional module variables are not required because they already have default values assigned when the variables where defined within the modules `variables.tf` file. If the default values do not need to be changed by the root project consuming the module, then they do not even need to be included in the root project. If any of the variables do need to be changed, then they can be added to the root project in the same way that the required variables were defined and utilized. Optional variables also may alter how the module provisions resources in the cases of encryption or IAM policy generation. A variable could flag an encryption requirement when provisioning an S3 bucket or Dynamo table by providing a KMS CMK, for example. Another use case may be the passage of ARN values to allow users or roles access to services or resources, whereas by default permissions would be more restrictive or only assigned to the account root or a single IAM role. A detailed explanation of each of this modules optional variables can be found below:
 
 <br><br>
 
@@ -121,29 +208,6 @@ variable "provider_region" {
   description = "The region where this project will be provisioned within AWS."
   type        = string
   default     = "us-east-1"
-}
-```
-
-<br><br><br>
-
-## :red_circle: vpc_id
-
-<br>
-
-![Required](images/neon_required.png)
-
-<br>
-
-This variable value defines the target VPC where the CodeBuild Security Group will be created. The VPC Id can also be obtained using a TF data source if the VPC was previously deployed using Terraform and provided that this project root module has the necessary permissions to query the TF state file.
-
-<br>
-
-### Declaration in variables.tf
-
-```terraform
-variable "vpc_id" {
-  description = "The id of the VPC that the CodeBuild Security Group will be placed in. This information can also be gathered from a data source if the VPC was deployed using TF."
-  type        = string
 }
 ```
 
@@ -225,54 +289,324 @@ variable "security_group_name" {
 
 This project root module can be deployed to various accounts and regions with the use of tfvar files. Below is an example tfvar file template that contains the variable declarations of any variables defined in this project root as well as any modules that this project root will utilize to provision resources. Any variables contained within the template that are used by modules used within this project root are fully documented on their respective Github repositories. All Variables within the template below are set to the default values if present during the declaration of the variable in the variables.tf file within each module respectively.
 
-<br>
+<br><br>
+
+## Complete Module variables.tf File
 
 ```terraform
-#####################
-# Common Variables: #
-#####################
-provider_region  = "us-east-1"
+###########################################################################
+# Terraform Config Vars:                                                  #
+###########################################################################
+variable "provider_region" {
+  description = "The region where this project will be provisioned within AWS."
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_id" {
+  description = "The id of the VPC that the CodeBuild Security Group will be placed in. This information can also be gathered from a data source if the VPC was deployed using TF."
+  type        = string
+}
+
+
+###########################################################################
+# Required KMS CMK Module Vars:                                           #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
+variable "cmk_alias" {
+  type        = string
+  description = "The alias that will be used to reference the provisioned KMS CMK. This value will be appended to alias/ within the module."
+  default     = "cmk/codebuild"
+}
+
+variable "cmk_description" {
+  type        = string
+  description = "Description providing information about the KMS CMK that will be provisioned."
+  default     = "KMS CMK that will be used to encrypt objects and resources used in the CodeBuild Lambda Deployment Pipeline."
+}
+
+
+###########################################################################
+# Required CodeBuild S3 Bucket Module Vars:                               #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
+variable "bucket_name" {
+  type        = string
+  description = "The S3 bucket that CodeBuild will use to push built Lambda deployment packages to. This bucket will also be used for the deployments of those functions."
+  default     = "codebuild-lambda-artifact-bucket"
+}
+
+variable "bucket_region" {
+  type        = string
+  description = "The AWS region where the S3 bucket will be provisioned."
+  default     = "empty"
+}
+
+variable "bucket_prefix" {
+  type        = list
+  description = "Prefix values that will be added to the beginning of the S3 bucket name for uniqueness."
+  default     = []
+}
+
+variable "bucket_suffix" {
+  type        = list
+  description = "Suffix values that will be added to the end of the S3 bucket name for uniqueness."
+  default     = []
+}
+
+variable "s3_versioning_enabled" {
+  type        = bool
+  description = "Flag to enable bucket object versioning."
+  default     = false
+}
+
+variable "s3_encryption_enabled" {
+  type        = bool
+  description = "Flag to enable bucket object encryption."
+  default     = false
+}
+
+
+###########################################################################
+# Required CodeBuild SNS Topic Resource Vars:                             #
+###########################################################################
+variable "sns_topic_name" {
+  type        = string
+  description = "Name of the SNS Topic that will be used for Lambda build and deployment notifications."
+  default     = "codebuild_lambda_deployment_pipeline_event_notifications"
+}
+
+variable "sns_display_name" {
+  type        = string
+  description = "Display Name of the SNS Topic that will be used for Lambda build and deployment notifications."
+  default     = "CodeBuild-Lambda-Deployment-Pipeline-Event-Notifications"
+}
+
+
+###########################################################################
+# Required CodeBuild Security Group Resource Vars:                        #
+###########################################################################
+variable "security_group_name" {
+  type        = string
+  description = "The Name that will be assigned to the security group created for CodeBuild Projects."
+  default     = "CodeBuild-Lambda-Pipeline-SG"
+}
+
+
+###########################################################################
+# Required CodeBuild IAM Role Module Vars:                               #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
+variable "role_name" {
+  type        = string
+  description = "Name of the the CodeBuild Lambda Pipeline Service Role."
+  default     = "CodeBuild-Lambda-Pipeline-Service-Role"
+}
+
+variable "role_description" {
+  type        = string
+  description = "Specify the description for the the Lambda Pipeline Service Role."
+  default     = "CodeBuild Role that allows CodeBuild to build, create, update, deploy and maintain Lambda functions."
+}
+
+
+###########################################################################
+# Required Tags:                                                          #
+###########################################################################
+variable "tags" {
+  type        = map
+  description = "Specify any tags that should be added to the KMS CMK being provisioned."
+  default     = {
+    Provisoned_By  = "Terraform"
+    Root_GitHub_URL     = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
+  }
+}
+
+
+###########################################################################
+# Optional KMS CMK Module Vars:                                           #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
+variable "cmk_owners" {
+  type        = list(string)
+  description = "List of users/roles that will have ownership of the CodeBuild KMS CMK."
+  default     = []
+}
+
+variable "cmk_admins" {
+  type        = list
+  description = "List of users/roles that will have administrative permissions on the CodeBuild KMS CMK."
+  default     = []
+}
+
+variable "cmk_users" {
+  type        = list(string)
+  description = "List of users/roles that will have rights to use the KMS CMK to Encrypt/Decrypt/Re-Encrypt resources."
+  default     = []
+}
+
+variable "cmk_grantees" {
+  type        = list(string)
+  description = "List of users/roles that will be granted permissions to Create/List/Delete temporary grants to use the KMS CMK."
+  default     = []
+}
+
+
+###########################################################################
+# Optional S3 Bucket Module Vars:                                         #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
+variable "s3_mfa_delete" {
+  type        = bool
+  description = "Flag to enable the requirement of MFA in order to delete a bucket, object, or disable object versioning."
+  default     = false
+}
+
+variable "s3_kms_key_arn" {
+  type        = string
+  description = "The KMS CMK that will be used to encrypt objects within the CodeBuild Lambda deployment artifact bucket."
+  default     = "AES256"
+}
+
+variable "s3_bucket_acl" {
+  type        = string
+  description = "Access Control List that will be placed on the CodeBuild Lambda deployment artifact bucket."
+  default     = "private"
+}
+
+
+###########################################################################
+# Optional CodeBuild IAM Role Module Vars:                                #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
+variable "role_s3_access_list" {
+  type        = list(string)
+  description = "List of S3 Bucket ARNs that the CodeBuild Lambda Pipeline Service Role will be given access to."
+  default     = []
+}
+
+variable "role_sns_access_list" {
+  type        = list(string)
+  description = "List of SNS Topic ARNs that the CodeBuild Lambda Pipeline Service Role will be given access to."
+  default     = []
+}
+
+variable "role_cmk_access_list" {
+  type        = list(string)
+  description = "Optional - List of KMS CMK ARNs that the CodeBuild Lambda Pipeline Service Role will be given usage permissions to."
+  default     = []
+}
+```
+
+<br><br>
+
+## Complete Module TFVars File
+
+```terraform
+###########################################################################
+# Terraform Config Vars:                                                  #
+###########################################################################
+provider_region  = "us-east-2"
 vpc_id           = "vpc-xxxxxxxx"
 
-########################
-# KMS Key Module Vars: #
-########################
+
+###########################################################################
+# Required CodeBuild KMS CMK Module Vars:                                 #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
 cmk_alias             = "cmk/codebuild"
 cmk_description       = "KMS CMK that will be used to encrypt objects and resources used in the CodeBuild Lambda Deployment Pipeline."
+
+
+###########################################################################
+# Required CodeBuild S3 Bucket Module Vars:                               #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
+s3_bucket_name        = "codebuild-lambda-artifact-bucket"
+bucket_region         = "us-east-2"
+bucket_prefix         = ["account-prefix"]
+bucket_suffix         = ["region-suffix"]
+s3_versioning_enabled = true
+s3_encryption_enabled = true
+
+
+###########################################################################
+# Required CodeBuild SNS Topic Resource Vars:                             #
+###########################################################################
+sns_topic_name        = "codebuild_lambda_deployment_pipeline_event_notifications"
+sns_display_name      = "CodeBuild-Lambda-Deployment-Pipeline-Event-Notifications"
+
+
+###########################################################################
+# Required CodeBuild Security Group Resource Vars:                        #
+###########################################################################
+security_group_name   = "CodeBuild-Lambda-Pipeline-SG"
+
+
+###########################################################################
+# Required CodeBuild IAM Role Module Vars:                               #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
+role_name             = "CodeBuild-Lambda-Pipeline-Service-Role"
+role_description      = "CodeBuild Role that allows CodeBuild to build, create, update, deploy and maintain Lambda functions."
+
+
+###########################################################################
+# Required Tags:                                                          #
+###########################################################################
+tags = {
+    Provisoned_By  = "Terraform"
+    GitHub_URL     = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
+}
+
+
+###########################################################################
+# Optional KMS CMK Module Vars:                                           #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
 cmk_owners            = []
 cmk_admins            = []
 cmk_users             = []
 cmk_grantees          = []
 
-################################
-# SNS Notification Topic Vars: #
-################################
-sns_topic_name        = "codebuild_lambda_deployment_pipeline_event_notifications"
-sns_display_name      = "CodeBuild-Lambda-Deployment-Pipeline-Event-Notifications"
 
-#############################
-# CodeBuild S3 Bucket Vars: #
-#############################
-bucket_name           = "codebuild-lambda-artifact-bucket"
-bucket_region         = "empty"
-bucket_prefix         = []
-bucket_suffix         = []
-s3_versioning_enabled = false
+###########################################################################
+# Optional S3 Bucket Module Vars:                                         #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
 s3_mfa_delete         = false
-s3_encryption_enabled = false
-s3_kms_key_arn        = "AES256"
 s3_bucket_acl         = "private"
+s3_kms_key_arn        = "AES256"
 
-###################################
-# CodeBuild Security Group Vars:  #
-###################################
-security_group_name   = "CodeBuild-Lambda-Pipeline-SG"
 
-###############################
-# CodeBuild IAM Role Vars:    #
-###############################
-role_name             = "CodeBuild-Lambda-Pipeline-Service-Role"
-role_description      = "CodeBuild Role that allows CodeBuild to build, create, update, deploy and maintain Lambda functions."
+###########################################################################
+# Optional CodeBuild IAM Role Module Vars:                                #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
 role_s3_access_list   = []
 role_sns_access_list  = []
 role_cmk_access_list  = []
@@ -280,15 +614,21 @@ role_cmk_access_list  = []
 
 <br><br>
 
-# `terraform init` output
+# Executing the Project Root
+
+Below is a complete example of the root project being executed, From Init to Destory for reference.
+
+<br>
+
+## `terraform init` output
 
 ```terraform
 Initializing modules...
-Downloading git@github.com:CloudMage-TF/AWS-KMS-Module.git?ref=v1.0.2 for codebuild_cmk...
+Downloading git@github.com:CloudMage-TF/AWS-KMS-Module.git for codebuild_cmk...
 - codebuild_cmk in .terraform/modules/codebuild_cmk
-Downloading git@github.com:CloudMage-TF/AWS-S3Bucket-Module.git?ref=v1.0.3 for codebuild_s3_artifact_bucket...
+Downloading git@github.com:CloudMage-TF/AWS-S3Bucket-Module.git for codebuild_s3_artifact_bucket...
 - codebuild_s3_artifact_bucket in .terraform/modules/codebuild_s3_artifact_bucket
-Downloading git@github.com:CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Role-Module.git?ref=v1.0.2 for codebuild_service_role...
+Downloading git@github.com:CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Role-Module.git for codebuild_service_role...
 - codebuild_service_role in .terraform/modules/codebuild_service_role
 
 Initializing the backend...
@@ -327,17 +667,17 @@ Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
 persisted to local or remote state storage.
 
-module.codebuild_s3_artifact_bucket.data.aws_caller_identity.current: Refreshing state...
-module.codebuild_service_role.data.aws_caller_identity.current: Refreshing state...
-module.codebuild_service_role.data.aws_iam_policy_document.access_policy: Refreshing state...
 module.codebuild_s3_artifact_bucket.data.aws_region.current: Refreshing state...
-module.codebuild_cmk.data.aws_caller_identity.current: Refreshing state...
+module.codebuild_service_role.data.aws_caller_identity.current: Refreshing state...
 module.codebuild_service_role.data.aws_iam_policy_document.principal_policy: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_resource_policy: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_admin_policy: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_owner_policy: Refreshing state...
-module.codebuild_cmk.data.aws_iam_policy_document.kms_user_policy: Refreshing state...
+module.codebuild_s3_artifact_bucket.data.aws_caller_identity.current: Refreshing state...
+module.codebuild_service_role.data.aws_iam_policy_document.access_policy: Refreshing state...
+module.codebuild_cmk.data.aws_caller_identity.current: Refreshing state...
 module.codebuild_s3_artifact_bucket.data.aws_iam_policy_document.this: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_user_policy: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_owner_policy: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_admin_policy: Refreshing state...
+module.codebuild_cmk.data.aws_iam_policy_document.kms_resource_policy: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.temp_kms_owner_kms_admin_merge_policy: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.temp_kms_admin_kms_user_merge_policy: Refreshing state...
 module.codebuild_cmk.data.aws_iam_policy_document.this: Refreshing state...
@@ -414,7 +754,7 @@ Terraform will perform the following actions:
                       + Action    = "kms:*"
                       + Effect    = "Allow"
                       + Principal = {
-                          + AWS = "arn:aws:iam::123456789101:root"
+                          + AWS = "arn:aws:iam::987303449646:root"
                         }
                       + Resource  = "*"
                       + Sid       = "KMSKeyOwnerPolicy"
@@ -423,6 +763,7 @@ Terraform will perform the following actions:
               + Version   = "2012-10-17"
             }
         )
+      + tags                    = (known after apply)
     }
 
   # module.codebuild_s3_artifact_bucket.aws_s3_bucket.encrypted_bucket[0] will be created
@@ -456,49 +797,13 @@ Terraform will perform the following actions:
                         ]
                       + Sid       = "DenyNonSecureTransport"
                     },
-                  + {
-                      + Action    = "s3:PutObject"
-                      + Condition = {
-                          + StringNotEquals = {
-                              + s3:x-amz-server-side-encryption = [
-                                  + "aws:kms",
-                                  + "AES256",
-                                ]
-                            }
-                        }
-                      + Effect    = "Deny"
-                      + Principal = {
-                          + AWS = "*"
-                        }
-                      + Resource  = [
-                          + "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          + "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
-                        ]
-                      + Sid       = "DenyIncorrectEncryptionHeader"
-                    },
-                  + {
-                      + Action    = "s3:PutObject"
-                      + Condition = {
-                          + Null = {
-                              + s3:x-amz-server-side-encryption = "true"
-                            }
-                        }
-                      + Effect    = "Deny"
-                      + Principal = {
-                          + AWS = "*"
-                        }
-                      + Resource  = [
-                          + "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix/*",
-                          + "arn:aws:s3:::account-prefix-codebuild-lambda-artifact-bucket-region-suffix",
-                        ]
-                      + Sid       = "DenyUnEncryptedObjectUploads"
-                    },
                 ]
               + Version   = "2012-10-17"
             }
         )
       + region                      = "us-east-2"
       + request_payer               = (known after apply)
+      + tags                        = (known after apply)
       + website_domain              = (known after apply)
       + website_endpoint            = (known after apply)
 
@@ -610,6 +915,7 @@ Terraform will perform the following actions:
       + max_session_duration  = 14400
       + name                  = "CodeBuild-Lambda-Pipeline-Service-Role"
       + path                  = "/"
+      + tags                  = (known after apply)
       + unique_id             = (known after apply)
     }
 
@@ -1346,7 +1652,7 @@ This project root module depends on the above referenced KMS, S3 and CodeBuild L
 
 <br><br>
 
-# Contributions and Contacts
+# Contacts and Contributions
 
 This project is owned by [CloudMage](rnason@cloudmage.io).
 

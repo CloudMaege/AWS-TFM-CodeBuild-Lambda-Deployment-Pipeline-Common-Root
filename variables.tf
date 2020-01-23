@@ -1,6 +1,6 @@
-#####################
-# Common Variables: #
-#####################
+###########################################################################
+# Terraform Config Vars:                                                  #
+###########################################################################
 variable "provider_region" {
   description = "The region where this project will be provisioned within AWS."
   type        = string
@@ -12,9 +12,12 @@ variable "vpc_id" {
   type        = string
 }
 
-########################
-# KMS Key Module Vars: #
-########################
+
+###########################################################################
+# Required KMS CMK Module Vars:                                           #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
 variable "cmk_alias" {
   type        = string
   description = "The alias that will be used to reference the provisioned KMS CMK. This value will be appended to alias/ within the module."
@@ -27,48 +30,12 @@ variable "cmk_description" {
   default     = "KMS CMK that will be used to encrypt objects and resources used in the CodeBuild Lambda Deployment Pipeline."
 }
 
-variable "cmk_owners" {
-  type        = list(string)
-  description = "List of users/roles that will have ownership of the CodeBuild KMS CMK."
-  default     = []
-}
 
-variable "cmk_admins" {
-  type        = list
-  description = "List of users/roles that will have administrative permissions on the CodeBuild KMS CMK."
-  default     = []
-}
-
-variable "cmk_users" {
-  type        = list(string)
-  description = "List of users/roles that will have rights to use the KMS CMK to Encrypt/Decrypt/Re-Encrypt resources."
-  default     = []
-}
-
-variable "cmk_grantees" {
-  type        = list(string)
-  description = "List of users/roles that will be granted permissions to Create/List/Delete temporary grants to use the KMS CMK."
-  default     = []
-}
-
-################################
-# SNS Notification Topic Vars: #
-################################
-variable "sns_topic_name" {
-  type        = string
-  description = "Name of the SNS Topic that will be used for Lambda build and deployment notifications."
-  default     = "codebuild_lambda_deployment_pipeline_event_notifications"
-}
-
-variable "sns_display_name" {
-  type        = string
-  description = "Display Name of the SNS Topic that will be used for Lambda build and deployment notifications."
-  default     = "CodeBuild-Lambda-Deployment-Pipeline-Event-Notifications"
-}
-
-#############################
-# CodeBuild S3 Bucket Vars: #
-#############################
+###########################################################################
+# Required CodeBuild S3 Bucket Module Vars:                               #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
 variable "bucket_name" {
   type        = string
   description = "The S3 bucket that CodeBuild will use to push built Lambda deployment packages to. This bucket will also be used for the deployments of those functions."
@@ -99,15 +66,112 @@ variable "s3_versioning_enabled" {
   default     = false
 }
 
-variable "s3_mfa_delete" {
-  type        = bool
-  description = "Flag to enable the requirement of MFA in order to delete a bucket, object, or disable object versioning."
-  default     = false
-}
-
 variable "s3_encryption_enabled" {
   type        = bool
   description = "Flag to enable bucket object encryption."
+  default     = false
+}
+
+
+###########################################################################
+# Required CodeBuild SNS Topic Resource Vars:                             #
+###########################################################################
+variable "sns_topic_name" {
+  type        = string
+  description = "Name of the SNS Topic that will be used for Lambda build and deployment notifications."
+  default     = "codebuild_lambda_deployment_pipeline_event_notifications"
+}
+
+variable "sns_display_name" {
+  type        = string
+  description = "Display Name of the SNS Topic that will be used for Lambda build and deployment notifications."
+  default     = "CodeBuild-Lambda-Deployment-Pipeline-Event-Notifications"
+}
+
+
+###########################################################################
+# Required CodeBuild Security Group Resource Vars:                        #
+###########################################################################
+variable "security_group_name" {
+  type        = string
+  description = "The Name that will be assigned to the security group created for CodeBuild Projects."
+  default     = "CodeBuild-Lambda-Pipeline-SG"
+}
+
+
+###########################################################################
+# Required CodeBuild IAM Role Module Vars:                               #
+#-------------------------------------------------------------------------#
+# The following variables require consumer defined values to be provided. #
+###########################################################################
+variable "role_name" {
+  type        = string
+  description = "Name of the the CodeBuild Lambda Pipeline Service Role."
+  default     = "CodeBuild-Lambda-Pipeline-Service-Role"
+}
+
+variable "role_description" {
+  type        = string
+  description = "Specify the description for the the Lambda Pipeline Service Role."
+  default     = "CodeBuild Role that allows CodeBuild to build, create, update, deploy and maintain Lambda functions."
+}
+
+
+###########################################################################
+# Required Tags:                                                          #
+###########################################################################
+variable "tags" {
+  type        = map
+  description = "Specify any tags that should be added to the KMS CMK being provisioned."
+  default     = {
+    Provisoned_By  = "Terraform"
+    Root_GitHub_URL     = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
+  }
+}
+
+
+###########################################################################
+# Optional KMS CMK Module Vars:                                           #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
+variable "cmk_owners" {
+  type        = list(string)
+  description = "List of users/roles that will have ownership of the CodeBuild KMS CMK."
+  default     = []
+}
+
+variable "cmk_admins" {
+  type        = list
+  description = "List of users/roles that will have administrative permissions on the CodeBuild KMS CMK."
+  default     = []
+}
+
+variable "cmk_users" {
+  type        = list(string)
+  description = "List of users/roles that will have rights to use the KMS CMK to Encrypt/Decrypt/Re-Encrypt resources."
+  default     = []
+}
+
+variable "cmk_grantees" {
+  type        = list(string)
+  description = "List of users/roles that will be granted permissions to Create/List/Delete temporary grants to use the KMS CMK."
+  default     = []
+}
+
+
+###########################################################################
+# Optional S3 Bucket Module Vars:                                         #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
+variable "s3_mfa_delete" {
+  type        = bool
+  description = "Flag to enable the requirement of MFA in order to delete a bucket, object, or disable object versioning."
   default     = false
 }
 
@@ -123,36 +187,14 @@ variable "s3_bucket_acl" {
   default     = "private"
 }
 
-###################################
-# CodeBuild Security Group Vars:  #
-###################################
-variable "security_group_name" {
-  type        = string
-  description = "The Name that will be assigned to the security group created for CodeBuild Projects."
-  default     = "CodeBuild-Lambda-Pipeline-SG"
-}
 
-###############################
-# CodeBuild IAM Role Vars:    #
-###############################
-variable "create_role" {
-  type        = bool
-  description = "Specify if the Codebuild Lambda Pipeline service role should be created. Note The role only needs to be created once within an account, as its an account global resource."
-  default     = true
-}
-
-variable "role_name" {
-  type        = string
-  description = "Name of the the CodeBuild Lambda Pipeline Service Role."
-  default     = "CodeBuild-Lambda-Pipeline-Service-Role"
-}
-
-variable "role_description" {
-  type        = string
-  description = "Specify the description for the the Lambda Pipeline Service Role."
-  default     = "CodeBuild Role that allows CodeBuild to build, create, update, deploy and maintain Lambda functions."
-}
-
+###########################################################################
+# Optional CodeBuild IAM Role Module Vars:                                #
+#-------------------------------------------------------------------------#
+# The following variables have default values already set by the module.  #
+# They will not need to be included in a project root module variables.tf #
+# file unless a non-default value needs be assigned to the variable.      #
+###########################################################################
 variable "role_s3_access_list" {
   type        = list(string)
   description = "List of S3 Bucket ARNs that the CodeBuild Lambda Pipeline Service Role will be given access to."
