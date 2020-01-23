@@ -109,7 +109,7 @@ Module variables that need to either be defined or re-defined with a non-default
 
 ```terraform
 module "kms" {
-  source = "git@github.com:CloudMage-TF/AWS-KMS-Module?ref=v1.0.3"
+  source = "git@github.com:CloudMage-TF/AWS-KMS-Module?ref=v1.0.4"
 
   // Required Variables
   kms_key_alias_name        = "prod/s3"
@@ -145,7 +145,7 @@ cmk_alias = "dev/ebs"
 
 ```terraform
 module "kms" {
-  source = "git@github.com:CloudMage-TF/AWS-KMS-Module?ref=v1.0.3"
+  source = "git@github.com:CloudMage-TF/AWS-KMS-Module?ref=v1.0.4"
 
   // Required Variables
   kms_key_alias_name = var.cmk_alias
