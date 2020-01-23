@@ -538,8 +538,8 @@ cmk_description       = "KMS CMK that will be used to encrypt objects and resour
 ###########################################################################
 s3_bucket_name        = "codebuild-lambda-artifact-bucket"
 bucket_region         = "us-east-2"
-bucket_prefix         = ["account-prefix"]
-bucket_suffix         = ["region-suffix"]
+bucket_prefix         = ["account_prefix"]
+bucket_suffix         = ["region_suffix"]
 s3_versioning_enabled = true
 s3_encryption_enabled = true
 
@@ -570,8 +570,8 @@ role_description      = "CodeBuild Role that allows CodeBuild to build, create, 
 # Required Tags:                                                          #
 ###########################################################################
 tags = {
-    Provisoned_By  = "Terraform"
-    GitHub_URL     = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
+    Provisoned_By   = "Terraform"
+    Root_GitHub_URL = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
 }
 
 

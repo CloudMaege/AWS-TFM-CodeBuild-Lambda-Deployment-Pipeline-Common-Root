@@ -122,10 +122,10 @@ variable "role_description" {
 ###########################################################################
 variable "tags" {
   type        = map
-  description = "Specify any tags that should be added to the KMS CMK being provisioned."
+  description = "Specify any tags that should be added to the resources being provisioned."
   default     = {
-    Provisoned_By  = "Terraform"
-    Root_GitHub_URL     = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
+    Provisoned_By   = "Terraform"
+    Root_GitHub_URL = "https://github.com/CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Common-Root.git"
   }
 }
 

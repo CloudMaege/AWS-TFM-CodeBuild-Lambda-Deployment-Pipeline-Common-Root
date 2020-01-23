@@ -13,8 +13,7 @@ provider "aws" {
 ######################
 // Create the required KMS Key
 module "codebuild_cmk" {
-  source = "git@github.com:CloudMage-TF/AWS-KMS-Module.git"
-  # source = "git@github.com:CloudMage-TF/AWS-KMS-Module.git?ref=v1.0.3"
+  source = "git@github.com:CloudMage-TF/AWS-KMS-Module.git?ref=v1.0.3"
 
   // Required Vars
   kms_key_alias_name          = var.cmk_alias
@@ -48,8 +47,7 @@ resource "aws_sns_topic" "events" {
 # Lambda Deployment Bucket: #
 #############################
 module "codebuild_s3_artifact_bucket" {
-  source = "git@github.com:CloudMage-TF/AWS-S3Bucket-Module.git"
-  # source = "git@github.com:CloudMage-TF/AWS-S3Bucket-Module.git?ref=v1.1.0"
+  source = "git@github.com:CloudMage-TF/AWS-S3Bucket-Module.git?ref=v1.1.0"
 
   // Required Vars
   s3_bucket_name              = var.bucket_name
@@ -80,7 +78,6 @@ resource "aws_security_group" "codebuild_security_group" {
   name        = var.security_group_name
   description = "Allows Outbound from CodeBuild to Public for updates."
   vpc_id      = var.vpc_id
-  # vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   egress {
     from_port   = 0
@@ -95,8 +92,7 @@ resource "aws_security_group" "codebuild_security_group" {
 # Lambda Deployment Role: #
 ###########################
 module "codebuild_service_role" {
-  source = "git@github.com:CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Role-Module.git"
-  # source = "git@github.com:CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Role-Module.git?ref=v1.0.3"
+  source = "git@github.com:CloudMage-TF/AWS-CodeBuild-Lambda-Deployment-Pipeline-Role-Module.git?ref=v1.0.3"
   
   // Required Vars
   codebuild_role_name                     = var.role_name
